@@ -40,6 +40,7 @@ class MOL_OT_install_dependencies(bpy.types.Operator):
     bl_label = "Install Dependencies"
     bl_description = "Install the required python packages to enable import."
     bl_options = {'REGISTER', 'INTERNAL'}
+
     
     def execute(self, context):
         if not pkg.available():
@@ -53,7 +54,11 @@ class MOL_OT_install_dependencies(bpy.types.Operator):
             logfile.write("Installer Started: " + str(datetime.datetime.now()) + '\n')
             logfile.write("-----------------------------------" + '\n')
             
-            pkg.install()
+            pkg.install(
+                mirror=bpy.context.scene.pypi_mirror,
+                pyrosetta_user=bpy.context.scene.pyrosetta_username,
+                pyrosetta_password=bpy.context.scene.pyrosetta_password
+            )
             
             logfile.write("###################################" + '\n')
             logfile.write("Installer finished: " + str(datetime.datetime.now()) + '\n')
