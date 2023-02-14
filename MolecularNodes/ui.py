@@ -330,30 +330,6 @@ def MOL_PT_panel_ui(layout_function, scene):
         else:
             MOL_PT_panel_md_traj(layout_function, scene)
 
-        # provide an alternative solution to users that will not waste time on setting up PyRosetta
-        if not pkg.pyrosetta_available():
-            layout_function = box.box()
-            col_main = layout_function.column(heading = '', align = False)
-            col_main.alert = False
-            col_main.enabled = True
-            col_main.active = True
-            col_main.use_property_split = False
-            col_main.use_property_decorate = False
-            col_main.scale_x = 1.0
-            col_main.scale_y = 1.0
-            col_main.alignment = 'Expand'.upper()
-            
-            col_main.label(text = "Set PyRosetta Mirror")
-            row_import = col_main.row()
-            row_import.prop(bpy.context.scene, 'pyrosetta_mirror',text='Mirror')
-            
-            col_main.label(text = "PyRosetta License")
-            row_import = col_main.row()
-            row_import.prop(bpy.context.scene, 'pyrosetta_username', text='User')
-            row_import = col_main.row()
-            row_import.prop(bpy.context.scene, 'pyrosetta_password', text='Password')
-            layout_function.operator('mol.install_pyrosetta', text = 'Install PyRosetta')
-
 
 
 class MOL_PT_panel(bpy.types.Panel):
