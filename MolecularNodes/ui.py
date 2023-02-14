@@ -10,6 +10,8 @@ import os
 
 
 
+
+
 # operator that calls the function to import the structure from the PDB
 class MOL_OT_Import_Protein_RCSB(bpy.types.Operator):
     bl_idname = "mol.import_protein_rcsb"
@@ -39,8 +41,6 @@ class MOL_OT_Import_Protein_RCSB(bpy.types.Operator):
 
     def invoke(self, context, event):
         return self.execute(context)
-
-
 
 
 # operator that calls the function to import the structure from a local file
@@ -289,7 +289,25 @@ class MOL_MT_Default_Style(bpy.types.Menu):
 def MOL_PT_panel_ui(layout_function, scene): 
     layout_function.label(text = "Import Options", icon = "MODIFIER")
     if not pkg.available():
+        
+        col_main = layout_function.column(heading = '', align = False)
+        col_main.alert = False
+        col_main.enabled = True
+        col_main.active = True
+        col_main.use_property_split = False
+        col_main.use_property_decorate = False
+        col_main.scale_x = 1.0
+        col_main.scale_y = 1.0
+        
+        col_main.alignment = 'Expand'.upper()
+        col_main.label(text = "PIP")
+        row_import = col_main.row()
+        row_import.prop(bpy.context.scene, 'pypi_mirror', text='PyPI Mirror')
+        row_import.prop(bpy.context.scene, 'pyrosetta_username', text='PyRosetta User')
+        row_import.prop(bpy.context.scene, 'pyrosetta_password', text='PyRosetta Password')
         layout_function.operator('mol.install_dependencies', text = 'Install Packages')
+
+
     else:
         box = layout_function.box()
         grid = box.grid_flow(columns = 2)
@@ -723,6 +741,7 @@ class MOL_MT_Add_Node_Menu_Selections(bpy.types.Menu):
         menu_item_interface(layout, 'Slice', 'MOL_sel_slice', 
                             "Create a selection that is a slice along one of the XYZ axes, based on the position of an object.")
         layout.separator()
+
         menu_residues_selection_custom(layout)                        
         menu_item_interface(layout, 'Res ID Single', 'MOL_sel_res_id', 
                             "Create a selection if res_id matches input field")
