@@ -43,6 +43,13 @@ def register():
         default = '', 
         subtype = 'NONE', 
         )
+    bpy.types.Scene.pyrosetta_mirror = bpy.props.StringProperty(
+        name = 'pyrosetta_mirror', 
+        description = 'PyRosetta Mirror', 
+        options = {'TEXTEDIT_UPDATE'}, 
+        default = 'US East coast', 
+        subtype = 'NONE', 
+        )
     bpy.types.Scene.pyrosetta_username = bpy.props.StringProperty(
         name = 'pyrosetta_username', 
         description = 'PyRosetta Username', 
@@ -202,16 +209,13 @@ def register():
     bpy.utils.register_class(MOL_OT_Ligand_Selection_Custom)
     
     bpy.utils.register_class(MOL_OT_install_dependencies)
+    bpy.utils.register_class(MOL_OT_install_pyrosetta)
     bpy.utils.register_class(MOL_OT_Add_Custom_Node_Group)
 
     bpy.utils.register_class(MOL_OT_Residues_Selection_Custom)
 
 
 def unregister():
-    del bpy.types.Scene.pypi_mirror
-    del bpy.types.Scene.pyrosetta_username
-    del bpy.types.Scene.pyrosetta_password
-
     del bpy.types.Scene.mol_pdb_code
     del bpy.types.Scene.mol_md_selection
     del bpy.types.Scene.mol_import_center
@@ -265,6 +269,7 @@ def unregister():
     bpy.utils.unregister_class(MOL_OT_Chain_Selection_Custom)
     
     bpy.utils.unregister_class(MOL_OT_install_dependencies)
+    bpy.utils.unregister_class(MOL_OT_install_pyrosetta)
     bpy.utils.unregister_class(MOL_OT_Add_Custom_Node_Group)
 
     bpy.utils.unregister_class(MOL_OT_Residues_Selection_Custom)
