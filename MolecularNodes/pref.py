@@ -30,7 +30,6 @@ from . import pkg
 import bpy
 import os
 
-# ---------------- GLOBAL ADDON LOGGER -------------------
 
 # ------------- DEFINE ADDON PREFERENCES ----------------
 # an operator that installs the python dependencies
@@ -40,33 +39,13 @@ class MOL_OT_install_dependencies(bpy.types.Operator):
     bl_label = "Install Dependencies"
     bl_description = "Install the required python packages to enable import."
     bl_options = {'REGISTER', 'INTERNAL'}
-
     
     def execute(self, context):
         if not pkg.available():
-            import datetime
-            
-            # generate logfile
-            logfile_path = os.path.abspath(MolecularNodesAddon.logpath + 'side-packages-install.log')
-            logfile = open(logfile_path, 'a')
-            
-            logfile.write("-----------------------------------" + '\n')
-            logfile.write("Installer Started: " + str(datetime.datetime.now()) + '\n')
-            logfile.write("-----------------------------------" + '\n')
-            
             pkg.install(
-                mirror=bpy.context.scene.pypi_mirror,
-                pyrosetta_user=bpy.context.scene.pyrosetta_username,
-                pyrosetta_password=bpy.context.scene.pyrosetta_password
+                pypi_mirror=bpy.context.scene.pypi_mirror,
             )
             
-            logfile.write("###################################" + '\n')
-            logfile.write("Installer finished: " + str(datetime.datetime.now()) + '\n')
-            logfile.write("###################################" + '\n')
-            
-            # close the logfile
-            logfile.close()
-        
         if pkg.available():
             # bpy.context.preferences.addons['MolecularNodesPref'].preferences.packages_available = True
             self.report(
@@ -77,11 +56,46 @@ class MOL_OT_install_dependencies(bpy.types.Operator):
             # bpy.context.preferences.addons['MolecularNodesPref'].preferences.packages_available = False
             self.report(
                 {'ERROR'}, 
-                message='Failed to install required packages. Please check log file: ' + logfile_path
+                message='Failed to install required packages. '
                 )
         
         return {'FINISHED'}
 
+
+
+class MOL_OT_install_pyrosetta(bpy.types.Operator):
+    bl_idname = "mol.install_pyrosetta"
+    bl_label = "Install PyRosetta"
+    bl_description = "Install PyRosetta packages to enable import."
+    bl_options = {'REGISTER', 'INTERNAL'}
+
+    
+    def execute(self, context):
+        if not pkg.pyrosetta_available():
+            self.report(
+                {'INFO'}, 
+                message='Installing PyRosetta. This could take a long time ...'
+                )
+            pkg.install_pyrosetta(
+                pyrosetta_mirror=bpy.context.scene.pyrosetta_mirror,
+                pyrosetta_user=bpy.context.scene.pyrosetta_username,
+                pyrosetta_password=bpy.context.scene.pyrosetta_password
+            )
+
+        if pkg.pyrosetta_available():
+            # bpy.context.preferences.addons['MolecularNodesPref'].preferences.packages_available = True
+            self.report(
+                {'INFO'}, 
+                message='PyRosetta has been successfully installed.'
+                )
+        else:
+            # bpy.context.preferences.addons['MolecularNodesPref'].preferences.packages_available = False
+            self.report(
+                {'ERROR'}, 
+                message='Failed to install PyRosetta. Please check the script output.'
+                )
+        
+        return {'FINISHED'}
 
 # preferences pane for this Addon in the Blender preferences
 class MOL_PT_AddonPreferences(bpy.types.AddonPreferences):

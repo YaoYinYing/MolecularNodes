@@ -6,9 +6,7 @@ from . import pkg
 from . import load
 from . import md
 from . import assembly
-import os
-
-
+import os,pathlib
 
 
 
@@ -300,14 +298,11 @@ def MOL_PT_panel_ui(layout_function, scene):
         col_main.scale_y = 1.0
         
         col_main.alignment = 'Expand'.upper()
-        col_main.label(text = "PIP")
+        col_main.label(text = "Set PyPI Mirror (remain blank for default)")
         row_import = col_main.row()
-        row_import.prop(bpy.context.scene, 'pypi_mirror', text='PyPI Mirror')
-        row_import.prop(bpy.context.scene, 'pyrosetta_username', text='PyRosetta User')
-        row_import.prop(bpy.context.scene, 'pyrosetta_password', text='PyRosetta Password')
+        row_import.prop(bpy.context.scene, 'pypi_mirror',text='PyPI')
         layout_function.operator('mol.install_dependencies', text = 'Install Packages')
-
-
+        
     else:
         box = layout_function.box()
         grid = box.grid_flow(columns = 2)
@@ -334,6 +329,32 @@ def MOL_PT_panel_ui(layout_function, scene):
             MOL_PT_panel_local(layout_function)
         else:
             MOL_PT_panel_md_traj(layout_function, scene)
+
+        # provide an alternative solution to users that will not waste time on setting up PyRosetta
+        if not pkg.pyrosetta_available():
+            layout_function = box.box()
+            col_main = layout_function.column(heading = '', align = False)
+            col_main.alert = False
+            col_main.enabled = True
+            col_main.active = True
+            col_main.use_property_split = False
+            col_main.use_property_decorate = False
+            col_main.scale_x = 1.0
+            col_main.scale_y = 1.0
+            col_main.alignment = 'Expand'.upper()
+            
+            col_main.label(text = "Set PyRosetta Mirror")
+            row_import = col_main.row()
+            row_import.prop(bpy.context.scene, 'pyrosetta_mirror',text='Mirror')
+            
+            col_main.label(text = "PyRosetta License")
+            row_import = col_main.row()
+            row_import.prop(bpy.context.scene, 'pyrosetta_username', text='User')
+            row_import = col_main.row()
+            row_import.prop(bpy.context.scene, 'pyrosetta_password', text='Password')
+            layout_function.operator('mol.install_pyrosetta', text = 'Install PyRosetta')
+
+
 
 class MOL_PT_panel(bpy.types.Panel):
     bl_label = 'Molecular Nodes'
@@ -741,7 +762,6 @@ class MOL_MT_Add_Node_Menu_Selections(bpy.types.Menu):
         menu_item_interface(layout, 'Slice', 'MOL_sel_slice', 
                             "Create a selection that is a slice along one of the XYZ axes, based on the position of an object.")
         layout.separator()
-
         menu_residues_selection_custom(layout)                        
         menu_item_interface(layout, 'Res ID Single', 'MOL_sel_res_id', 
                             "Create a selection if res_id matches input field")
