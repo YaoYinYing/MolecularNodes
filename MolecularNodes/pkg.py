@@ -21,14 +21,6 @@ PYPI_MIRROR = {
     # append more if necessary.
 }
 
-PYROSETTA_BASE_URL = {
-    # from GrayLab
-    "US East coast": "https://graylab.jhu.edu/download/PyRosetta4/archive/release",
-    # from RosettaCommons
-    "US West coast": "https://west.rosettacommons.org/pyrosetta/release/release",
-    # append more if necessary.
-    }
-
 def verify_user_sitepackages(package_location):
     if os.path.exists(package_location) and package_location not in sys.path:
         sys.path.append(package_location)
@@ -59,83 +51,6 @@ def run_pip(cmd, mirror='', timeout=600):
             print("Full error message:\n")
             print(error_message)
 
-def get_pyrosetta_url(
-    pyrosetta_mirror="US East coast", 
-    username='username', 
-    password='password'):
-
-    # Store the base URL in a variable
-    base_url = f"{PYROSETTA_BASE_URL[pyrosetta_mirror]}/PyRosetta4.Release"
-    print(f'Using License: {username}:{password}')
-
-    # Get the Python version
-    python_version = "".join(str(i) for i in platform.python_version_tuple()[:2])
-
-    # Get the OS architecture
-    system = platform.system()
-    machine = platform.machine()
-    if system == "Darwin":
-        # Check if the machine is running Apple Silicon
-        if "arm" in machine:
-            os_arch = "m1"
-        else:
-            os_arch = "mac"
-    elif system == "Linux":
-        if machine == "x86_64":
-            # Check if the Linux distribution is Ubuntu
-            with open("/etc/lsb-release") as f:
-                if "Ubuntu" in f.read():
-                    os_arch = "ubuntu"
-                else:
-                    os_arch = "linux"
-        elif machine == "aarch64":
-            os_arch = "aarch64"
-        else:
-            raise ValueError("Unknown machine architecture.")
-    else:
-        raise ValueError("Unknown machine architecture.")
-
-    # Build the URL using the base URL, Python version, and OS architecture
-    url = f"{base_url}.python{python_version}.{os_arch}.wheel/latest.html"
-
-    # Send a GET request to the URL and store the response
-    response = requests.get(url, auth=(username, password))
-    print(url)
-
-    # Check if the request was successful
-    if response.status_code == 200:
-        # Use a regular expression to extract the link from the response text
-        match = re.search('<meta http-equiv="REFRESH" content="1; url=(.*?)">', response.text)
-        # Check if a match was found
-        if match:
-            # Extract the link from the match
-            refresh_url = match.group(1)
-            # Build the full URL using the refresh URL and base URL . The lisence is explictly passed to url for pip. NOT SAFE.
-            full_url = f"{base_url}.python{python_version}.{os_arch}.wheel/{refresh_url}".replace('//', f'//{username}:{password}@')
-            # Print the full URL
-            print(full_url)
-            return(full_url)
-        else:
-            # Print an error message
-            raise ChildProcessError("Error: Could not extract link from response text.")
-    else:
-        # Print an error message
-        raise ConnectionError("Error: Could not retrieve text from URL. Please check your license.")
-
-
-def install_pyrosetta(
-    pyrosetta_mirror='US East coast',
-    pyrosetta_user=None,
-    pyrosetta_password=None):
-    # fetch pyrosetta url w/ license
-    pyrosetta_url=get_pyrosetta_url(
-        pyrosetta_mirror=pyrosetta_mirror,
-        username=pyrosetta_user, 
-        password=pyrosetta_password)
-
-    # install pyrosetta
-    run_pip(f'pip install {pyrosetta_url}', timeout=3600)
-
 def install(pypi_mirror=''):
     # Get PIP upgraded
     run_pip('ensurepip')
@@ -148,13 +63,6 @@ def install(pypi_mirror=''):
     except:
         run_pip(f'pip install -r {ADDON_DIR}/requirements.txt', mirror=PYPI_MIRROR['BFSU'])
         
-
-def pyrosetta_available():
-    try: 
-        import pyrosetta
-        return True
-    except ImportError:
-        return False
 
 def available():
     verify()
