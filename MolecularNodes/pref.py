@@ -62,41 +62,6 @@ class MOL_OT_install_dependencies(bpy.types.Operator):
         return {'FINISHED'}
 
 
-
-class MOL_OT_install_pyrosetta(bpy.types.Operator):
-    bl_idname = "mol.install_pyrosetta"
-    bl_label = "Install PyRosetta"
-    bl_description = "Install PyRosetta packages to enable import."
-    bl_options = {'REGISTER', 'INTERNAL'}
-
-    
-    def execute(self, context):
-        if not pkg.pyrosetta_available():
-            self.report(
-                {'INFO'}, 
-                message='Installing PyRosetta. This could take a long time ...'
-                )
-            pkg.install_pyrosetta(
-                pyrosetta_mirror=bpy.context.scene.pyrosetta_mirror,
-                pyrosetta_user=bpy.context.scene.pyrosetta_username,
-                pyrosetta_password=bpy.context.scene.pyrosetta_password
-            )
-
-        if pkg.pyrosetta_available():
-            # bpy.context.preferences.addons['MolecularNodesPref'].preferences.packages_available = True
-            self.report(
-                {'INFO'}, 
-                message='PyRosetta has been successfully installed.'
-                )
-        else:
-            # bpy.context.preferences.addons['MolecularNodesPref'].preferences.packages_available = False
-            self.report(
-                {'ERROR'}, 
-                message='Failed to install PyRosetta. Please check the script output.'
-                )
-        
-        return {'FINISHED'}
-
 # preferences pane for this Addon in the Blender preferences
 class MOL_PT_AddonPreferences(bpy.types.AddonPreferences):
     bl_idname = 'MolecularNodesPref'
